@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desarrollo del Sistema Digestivo - Histo con Rodri</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        nav {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-title {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 3rem;
+            font-size: 1.8rem;
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .concept-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--accent-color);
+            transition: transform 0.3s;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .concept-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        /* Diagramas CSS */
+        .diagram-box {
+            background: #fff;
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .flow-step {
+            display: inline-block;
+            background: #ecf0f1;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: bold;
+            border: 1px solid #bdc3c7;
+        }
+
+        .flow-arrow {
+            display: inline-block;
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+
+        .gut-colors {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        
+        .gut-part {
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+        }
+
+        .foregut { background-color: #e74c3c; }
+        .midgut { background-color: #f1c40f; color: #333; }
+        .hindgut { background-color: #3498db; }
+
+        /* Flashcards Section */
+        .flashcards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 2rem;
+            perspective: 1000px;
+        }
+
+        .flashcard {
+            background-color: transparent;
+            width: 100%;
+            height: 200px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .flashcard-front {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            border: 2px solid var(--accent-color);
+            font-weight: bold;
+        }
+
+        .flashcard-back {
+            background-color: var(--accent-color);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Desarrollo del Sistema Digestivo</h1>
+        <p>Basado en el material de Histo con Rodri</p>
+    </header>
+
+    <nav>
+        <a href="#generalidades">Generalidades</a>
+        <a href="#plegamiento">Plegamiento</a>
+        <a href="#intestino-primitivo">Intestino Primitivo</a>
+        <a href="#faringe">Faringe</a>
+        <a href="#estomago">Estómago</a>
+        <a href="#flashcards">Flashcards (100)</a>
+    </nav>
+
+    <main>
+        <!-- 1. GENERALIDADES -->
+        <section id="generalidades">
+            <h2 class="section-title">1. Origen Embriológico y Generalidades</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>¿De dónde se origina?</h3>
+                    <p>Todo el sistema digestivo se forma a partir del <strong>Embrión Trilaminar</strong>. Específicamente:</p>
+                    <ul>
+                        <li><strong>Endodermo del saco vitelino:</strong> Da origen al epitelio de revestimiento del tubo digestivo, conductos y parénquima de glándulas mucosas/submucosas, y parénquima de hígado y páncreas.</li>
+                        <li><strong>Mesodermo:</strong> Da origen a la lámina propia, la submucosa y las capas musculares de la pared del intestino.</li>
+                    </ul>
+                </div>
+                <div class="concept-card">
+                    <h3>El Intestino Primitivo</h3>
+                    <p>Se forma por los plegamientos del embrión (céfalo-caudal y dorso-ventral). La porción dorsal del saco vitelino queda en el interior del embrión, dando origen al intestino primitivo.</p>
+                    <div class="diagram-box">
+                        <span class="flow-step">Saco Vitelino</span>
+                        <span class="flow-arrow">➔</span>
+                        <span class="flow-step">Plegamiento</span>
+                        <span class="flow-arrow">➔</span>
+                        <span class="flow-step" style="background:#3498db; color:white;">Intestino Primitivo</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. PLEGAMIENTO -->
+        <section id="plegamiento">
+            <h2 class="section-title">2. Plegamiento del Embrión</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>Plegamiento Céfalo-Caudal</h3>
+                    <p>Ocurre en el plano longitudinal. El extremo cefálico (cabeza) y caudal (cola) se pliegan ventralmente. Esto desplaza la membrana bucofaríngea y la membrana cloacal hacia la cara ventral del embrión.</p>
+                </div>
+                <div class="concept-card">
+                    <h3>Plegamiento Dorso-Ventral</h3>
+                    <p>Ocurre en el plano transversal. Los pliegues laterales se dirigen hacia la línea media ventral. Esto "cierra" el cuerpo del embrión, incluyendo la parte dorsal del saco vitelino en su interior para formar el intestino primitivo.</p>
+                </div>
+            </div>
+            <div class="diagram-box">
+                <h3>Límites del Intestino Primitivo</h3>
+                <p>Cefálico: Membrana Bucofaríngea | Caudal: Membrana Cloacal</p>
+            </div>
+        </section>
+
+        <!-- 3. INTESTINO PRIMITIVO -->
+        <section id="intestino-primitivo">
+            <h2 class="section-title">3. Intestino Primitivo (4ta Semana)</h2>
+            <p>A la 4ª semana, el intestino primitivo se divide en tres porciones principales:</p>
+            <div class="gut-colors">
+                <div class="gut-part foregut">
+                    <h4>Intestino Anterior</h4>
+                    <p>Faringe, esófago, estómago, duodeno proximal, hígado y páncreas.</p>
+                </div>
+                <div class="gut-part midgut">
+                    <h4>Intestino Medio</h4>
+                    <p>Duodeno distal, yeyuno, íleon, ciego, apéndice, colon ascendente y 2/3 del transverso.</p>
+                </div>
+                <div class="gut-part hindgut">
+                    <h4>Intestino Posterior</h4>
+                    <p>1/3 distal del colon transverso, colon descendente, sigmoides, recto y porción superior del canal anal.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. FARINGE -->
+        <section id="faringe">
+            <h2 class="section-title">4. Desarrollo del Intestino Faríngeo</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>Bolsas y Arcos Faríngeos</h3>
+                    <p>La faringe primitiva forma 5 divertículos laterales (bolsas faríngeas) a cada lado. Externamente se forman los arcos faríngeos (1º a 4º y 6º).</p>
+                    <p><strong>Límites de la Faringe Primitiva:</strong> Craneal: Estomodeo. Caudal: Ventral (Esbozo traqueobronquial), Dorsal (Inicio del esófago).</p>
+                </div>
+                <div class="concept-card">
+                    <h3>Desarrollo del Piso de la Faringe (Lengua)</h3>
+                    <p>Se forma a partir de engrosamientos por proliferación del mesodermo:</p>
+                    <ul>
+                        <li><strong>Anteriores al agujero ciego:</strong> Tubérculo Impar y Protuberancias linguales laterales (forman el cuerpo de la lengua - 2/3 anteriores).</li>
+                        <li><strong>Posteriores al agujero ciego:</strong> Cópula, Protuberancia Epiglótica, Protuberancias Aritenoideas.</li>
+                        <li><strong>Fusión 2-3-4 Arco Faríngeo:</strong> Forman la raíz de la lengua (1/3 posterior).</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="diagram-box">
+                <h3>Formación de la Lengua</h3>
+                <span class="flow-step" style="background:#f1c40f;">Tubérculo Impar + Protuberancias Laterales</span>
+                <span class="flow-arrow">➔</span>
+                <span class="flow-step">Cuerpo (2/3 anteriores)</span>
+                <br><br>
+                <span class="flow-step" style="background:#e74c3c; color:white;">2-3-4 Arco Faríngeo</span>
+                <span class="flow-arrow">➔</span>
+                <span class="flow-step">Raíz (1/3 posterior)</span>
+            </div>
+        </section>
+
+        <!-- 5. ESTÓMAGO -->
+        <section id="estomago">
+            <h2 class="section-title">5. Desarrollo del Estómago</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>Fases (4ª y 6ª Semana)</h3>
+                    <p>Es una dilatación de la porción caudal del intestino anterior. Inicialmente está aplanado lateralmente. En la 4ª semana tiene bordes dorsal y ventral, unidos por los mesogastrios dorsal y ventral.</p>
+                    <p>En la 6ª semana, por ensanchamientos y rotación sobre el eje longitudinal (90 grados en sentido horario), cambia sus caras y bordes:</p>
+                    <ul>
+                        <li>Cara izquierda ahora es Ventral.</li>
+                        <li>Cara derecha ahora es Dorsal.</li>
+                        <li>Borde dorsal ahora es Izquierdo.</li>
+                        <li>Borde ventral ahora es Derecho.</li>
+                    </ul>
+                </div>
+                <div class="concept-card">
+                    <h3>Mesogastrios y Ligamentos</h3>
+                    <p><strong>Mesogastrio Dorsal:</strong> Une el borde dorsal del intestino con la pared dorsal. Da origen a: Ligamento esplenorrenal izquierdo, Ligamento gastroesplénico, y la Bolsa Epiploica.</p>
+                    <p><strong>Mesogastrio Ventral:</strong> Une el borde ventral con la pared ventral. Da origen a: Ligamento hepatogástrico y Ligamento falciforme.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. FLASHCARDS -->
+        <section id="flashcards">
+            <h2 class="section-title">6. Flashcards de Estudio (100 Tarjetas)</h2>
+            <p>Haz clic en cada tarjeta para voltearla y ver la respuesta.</p>
+            
+            <div class="controls">
+                <button onclick="resetCards()">Reiniciar Tarjetas</button>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p id="progress-text">0 / 100 Tarjetas volteadas</p>
+            </div>
+
+            <div class="flashcards-container" id="flashcard-container">
+                <!-- Las flashcards se generarán con JavaScript aquí -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Array de 100 flashcards basadas en el texto
+        const flashcardsData = [
+            // 1-15: Generalidades y Capas Germinativas
+            { q: "¿De qué capa germinativa deriva el epitelio de revestimiento del tubo digestivo?", a: "Endodermo del saco vitelino" },
+            { q: "¿De qué capa germinativa derivan la lámina propia y la submucosa?", a: "Mesodermo" },
+            { q: "¿De qué capa germinativa derivan las capas musculares de la pared intestinal?", a: "Mesodermo" },
+            { q: "¿Qué parénquima glandular deriva del endodermo del saco vitelino?", a: "Hígado y Páncreas" },
+            { q: "¿Por qué se forma el intestino primitivo?", a: "Por los plegamientos céfalo-caudal y dorso-ventral del embrión" },
+            { q: "¿Qué porción del saco vitelino queda en el interior del embrión?", a: "La porción dorsal" },
+            { q: "¿Quién da origen a los conductos y parénquima de glándulas mucosas?", a: "El Endodermo" },
+            { q: "¿Qué estructura del embrión trilaminar forma todo el sistema digestivo?", a: "El Endodermo (epitelio) y Mesodermo (tejido conectivo/músculo)" },
+            { q: "¿De dónde se originan las glándulas submucosas?", a: "Del Endodermo" },
+            { q: "¿El músculo liso del intestino proviene del endodermo?", a: "No, proviene del Mesodermo" },
+            { q: "¿Qué pasa con el saco vitelino durante el plegamiento?", a: "Su parte dorsal se internaliza y forma el intestino primitivo" },
+            { q: "¿Cuáles son los dos tipos de plegamiento principales?", a: "Céfalo-caudal y Dorso-ventral" },
+            { q: "¿Qué capa embrionaria es la más interna?", a: "Endodermo" },
+            { q: "¿El parénquima del páncreas es de origen mesodérmico?", a: "No, es de origen endodérmico" },
+            { q: "¿La lámina propia es de origen endodérmico?", a: "No, es de origen mesodérmico" },
+
+            // 16-30: Plegamiento y Membranas
+            { q: "¿Qué membrana limita el intestino primitivo en su extremo cefálico?", a: "Membrana Bucofaríngea" },
+            { q: "¿Qué membrana limita el intestino primitivo en su extremo caudal?", a: "Membrana Cloacal" },
+            { q: "¿El plegamiento céfalo-caudal ocurre en qué plano?", a: "Plano longitudinal (cabeza y cola se pliegan)" },
+            { q: "¿El plegamiento dorso-ventral ocurre en qué plano?", a: "Plano transversal (pliegues laterales se unen)" },
+            { q: "¿Qué estructura se forma por el plegamiento dorso-ventral?", a: "El intestino primitivo (a partir del saco vitelino)" },
+            { q: "¿Qué membrana se encuentra en el extremo cefálico del embrión?", a: "Membrana Bucofaríngea" },
+            { q: "¿Qué membrana se encuentra en el extremo caudal del embrión?", a: "Membrana Cloacal" },
+            { q: "¿Los pliegues laterales forman la pared ventral del embrión?", a: "Sí" },
+            { q: "¿Qué estructura conecta el intestino primitivo con el saco vitelino?", a: "El pedículo vitelino (conducto onfalomesentérico)" },
+            { q: "¿Qué rodea al intestino primitivo en formación?", a: "La celoma intraembrionario" },
+            { q: "¿Hacia dónde se desplaza la membrana bucofaríngea durante el plegamiento?", a: "Hacia la cara ventral del embrión" },
+            { q: "¿Hacia dónde se desplaza la membrana cloacal?", a: "Hacia la cara ventral del embrión" },
+            { q: "¿El plegamiento cefalocaudal forma la porción anterior y posterior del tubo digestivo?", a: "Sí" },
+            { q: "¿El plegamiento lateral cierra el cuerpo ventralmente?", a: "Sí, formando el tubo digestivo" },
+            { q: "¿En qué semana ocurre la formación del intestino primitivo?", a: "A la 4ª semana" },
+
+            // 31-50: Intestino Primitivo (Divisiones)
+            { q: "¿En cuántas porciones se divide el intestino primitivo a la 4ª semana?", a: "En 3 porciones: Anterior, Medio y Posterior" },
+            { q: "¿Qué porción del intestino primitivo forma el esófago?", a: "Intestino Anterior" },
+            { q: "¿Qué porción del intestino primitivo forma el estómago?", a: "Intestino Anterior" },
+            { q: "¿Qué porción del intestino primitivo forma el hígado y páncreas?", a: "Intestino Anterior" },
+            { q: "¿Qué porción del intestino primitivo forma el duodeno distal?", a: "Intestino Medio" },
+            { q: "¿Qué porción del intestino primitivo forma el yeyuno e íleon?", a: "Intestino Medio" },
+            { q: "¿Qué porción del intestino primitivo forma el ciego y apéndice?", a: "Intestino Medio" },
+            { q: "¿Qué porción del intestino primitivo forma el colon ascendente?", a: "Intestino Medio" },
+            { q: "¿Qué porción del intestino primitivo forma el colon descendente?", a: "Intestino Posterior" },
+            { q: "¿Qué porción del intestino primitivo forma el recto?", a: "Intestino Posterior" },
+            { q: "¿Qué porción del intestino primitivo forma el colon sigmoides?", a: "Intestino Posterior" },
+            { q: "¿Qué porción forma el duodeno proximal?", a: "Intestino Anterior" },
+            { q: "¿Qué porción forma los 2/3 del colon transverso?", a: "Intestino Medio" },
+            { q: "¿Qué porción forma el 1/3 distal del colon transverso?", a: "Intestino Posterior" },
+            { q: "¿Qué porción forma la porción superior del canal anal?", a: "Intestino Posterior" },
+            { q: "¿Qué estructura marca el límite entre intestino anterior y medio?", a: "El Septo Transverso / Brote hepático" },
+            { q: "¿El intestino anterior comienza en la membrana bucofaríngea?", a: "Sí" },
+            { q: "¿El intestino posterior termina en la membrana cloacal?", a: "Sí" },
+            { q: "¿Qué estructura se forma en el intestino posterior relacionada con la vejiga?", a: "El Alantoides" },
+            { q: "¿El intestino medio está conectado al saco vitelino por el pedículo vitelino?", a: "Sí, en su porción media" },
+
+            // 51-75: Faringe y Lengua
+            { q: "¿Cuántos divertículos laterales forman las bolsas faríngeas?", a: "5 divertículos a cada lado" },
+            { q: "¿Cuál es el límite craneal de la faringe primitiva?", a: "El Estomodeo" },
+            { q: "¿Cuál es el límite caudal dorsal de la faringe primitiva?", a: "Inicio del esófago" },
+            { q: "¿Cuál es el límite caudal ventral de la faringe primitiva?", a: "Esbozo traqueobronquial" },
+            { q: "¿Qué son las bolsas faríngeas?", a: "Evaginaciones de la faringe que forman 5 divertículos laterales" },
+            { q: "¿Qué arco faríngeo forma el cuerpo de la lengua?", a: "El 1er Arco Faríngeo (Tubérculo Impar y Protuberancias linguales laterales)" },
+            { q: "¿Qué estructura forma la raíz de la lengua?", a: "La fusión del 2-3-4 Arco Faríngeo (Cópula)" },
+            { q: "¿Qué estructura forma los 2/3 anteriores de la lengua?", a: "El Tubérculo Impar y Protuberancias linguales laterales" },
+            { q: "¿Qué estructura forma el 1/3 posterior de la lengua?", a: "La Cópula (2-3-4 arco)" },
+            { q: "¿El agujero ciego separa qué partes de la lengua?", a: "El cuerpo (anterior) de la raíz (posterior)" },
+            { q: "¿Qué protuberancia se encuentra anterior al agujero ciego?", a: "El Tubérculo Impar" },
+            { q: "¿Qué protuberancias forman las papilas gustativas de la lengua?", a: "Las protuberancias linguales laterales" },
+            { q: "¿Qué estructura forma la epiglotis?", a: "La Protuberancia Epiglótica" },
+            { q: "¿Qué arcos forman las protuberancias aritenoideas?", a: "El 3er y 4to arco faríngeo" },
+            { q: "¿Qué mesodermo forma los engrosamientos del piso de la faringe?", a: "El mesodermo de los arcos faríngeos" },
+            { q: "¿El surco terminal separa qué estructuras?", a: "El cuerpo de la lengua de la raíz" },
+            { q: "¿Las bolsas faríngeas son internas o externas?", a: "Internas (surcos son externos)" },
+            { q: "¿Cuántos arcos faríngeos hay en total?", a: "6 arcos (1, 2, 3, 4, 5 rudimentario, 6)" },
+            { q: "¿El estomodeo forma el epitelio de los labios?", a: "Sí, forma parte de la boca primitiva" },
+            { q: "¿Qué arco faríngeo forma el hueso hioides?", a: "2do y 3er arco faríngeo" },
+            { q: "¿El seno cervical se forma por la fusión de qué?", a: "El 2do arco faríngeo sobre los arcos 3 y 4" },
+            { q: "¿Qué estructura forma el surco medio dorsal en la lengua?", a: "El surco terminal" },
+            { q: "¿La raíz de la lengua tiene origen en el 1er arco?", a: "No, en el 2-3-4 arco" },
+            { q: "¿El cuerpo de la lengua es de origen endodérmico o ectodérmico?", a: "El epitelio es ectodérmico (estomodeo), el músculo es mesodérmico" },
+            { q: "¿Las amígdalas palatinas derivan de qué bolsa faríngea?", a: "De la 2da bolsa faríngea" },
+
+            // 76-100: Estómago y Mesenterios
+            { q: "¿El estómago es una dilatación de qué porción?", a: "De la porción caudal del intestino anterior" },
+            { q: "¿Cómo está el estómago inicialmente en la 4ª semana?", a: "Aplanado en sentido lateral" },
+            { q: "¿Qué caras tiene el estómago en la 4ª semana?", a: "Cara lateral izquierda y cara lateral derecha" },
+            { q: "¿Qué mesogastrio une el borde dorsal del intestino con la pared dorsal?", a: "Mesogastrio Dorsal" },
+            { q: "¿Qué mesogastrio une el borde ventral con la pared ventral?", a: "Mesogastrio Ventral" },
+            { q: "¿Hacia dónde rota el estómago en la 6ª semana?", a: "Rota sobre su eje longitudinal (90 grados en sentido horario)" },
+            { q: "¿Qué pasa con la cara izquierda del estómago tras la rotación?", a: "Se convierte en la cara ventral" },
+            { q: "¿Qué pasa con el borde dorsal del estómago tras la rotación?", a: "Se convierte en el borde izquierdo" },
+            { q: "¿Qué pasa con el borde ventral del estómago tras la rotación?", a: "Se convierte en el borde derecho" },
+            { q: "¿Qué ligamento deriva del mesogastrio ventral?", a: "El ligamento hepatogástrico y el ligamento falciforme" },
+            { q: "¿Qué ligamento deriva del mesogastrio dorsal?", a: "El ligamento gastroesplénico y esplenorrenal izquierdo" },
+            { q: "¿Qué estructura se forma en el mesogastrio dorsal?", a: "La bolsa epiploica (saco menor de la cavidad peritoneal)" },
+            { q: "¿El bazo deriva del mesogastrio dorsal?", a: "Sí, se desarrolla en el mesogastrio dorsal" },
+            { q: "¿La rotación del estómago es en sentido horario o antihorario?", a: "En sentido horario (visto desde arriba)" },
+            { q: "¿En qué semana se completa la rotación del estómago?", a: "A la 6ª semana" },
+            { q: "¿El ligamento falciforme une el hígado con qué estructura?", a: "Con la pared abdominal ventral" },
+            { q: "¿El ligamento hepatogástrico une el hígado con qué?", a: "Con el estómago" },
+            { q: "¿El ligamento gastroesplénico une el estómago con qué?", a: "Con el bazo" },
+            { q: "¿El ligamento esplenorrenal izquierdo une el bazo con qué?", a: "Con el riñón izquierdo" },
+            { q: "¿Qué forma la curvatura mayor del estómago?", a: "El borde dorsal (después de la rotación)" },
+            { q: "¿Qué forma la curvatura menor del estómago?", a: "El borde ventral (después de la rotación)" },
+            { q: "¿El mesogastrio ventral desaparece completamente?", a: "No, forma el epiplón menor y el ligamento falciforme" },
+            { q: "¿La bolsa epiploica se comunica con la cavidad peritoneal?", a: "Sí, a través del foramen epiploico (de Winslow)" },
+            { q: "¿El hígado se desarrolla a partir del intestino anterior?", a: "Sí, a partir de un brote en el intestino anterior (septo transverso)" },
+            { q: "¿El páncreas se desarrolla a partir de qué porción?", a: "Del intestino anterior (brotes pancreáticos dorsal y ventral)" }
+        ];
+
+        // Lógica para renderizar las flashcards
+        const container = document.getElementById('flashcard-container');
+        let flippedCount = 0;
+        const totalCards = flashcardsData.length;
+
+        function renderFlashcards() {
+            container.innerHTML = '';
+            flashcardsData.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'flashcard';
+                cardElement.innerHTML = `
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">${card.q}</div>
+                        <div class="flashcard-back">${card.a}</div>
+                    </div>
+                `;
+                
+                cardElement.addEventListener('click', function() {
+                    this.classList.toggle('flipped');
+                    if (this.classList.contains('flipped')) {
+                        if (!this.dataset.flipped) {
+                            this.dataset.flipped = 'true';
+                            flippedCount++;
+                            updateProgress();
+                        }
+                    }
+                });
+
+                container.appendChild(cardElement);
+            });
+        }
+
+        function updateProgress() {
+            const percentage = (flippedCount / totalCards) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').innerText = `${flippedCount} / ${totalCards} Tarjetas volteadas`;
+        }
+
+        function resetCards() {
+            flippedCount = 0;
+            updateProgress();
+            const cards = document.querySelectorAll('.flashcard');
+            cards.forEach(card => {
+                card.classList.remove('flipped');
+                delete card.dataset.flipped;
+            });
+        }
+
+        // Inicializar la página
+        window.onload = function() {
+            renderFlashcards();
+            updateProgress();
+        };
+    </script>
+</body>
+</html>
